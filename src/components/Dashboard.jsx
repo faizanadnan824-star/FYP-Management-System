@@ -38,7 +38,10 @@ export default function Dashboard({ supervisors, setActiveTab }) {
           <article key={sv.id} className="supervisor-row">
             <article className="supervisor-info">
               <figure className="supervisor-avatar">
-                {sv.name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()}
+                {sv.image
+                  ? <img src={sv.image} alt={sv.name} style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} />
+                  : sv.name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()
+                }
               </figure>
               <section>
                 <p className="supervisor-name">{sv.name}</p>

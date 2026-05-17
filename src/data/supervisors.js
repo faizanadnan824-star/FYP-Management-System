@@ -2,6 +2,7 @@ export const supervisorsData = [
   {
     id: 1,
     name: "Mr. Asad Javed",
+    // image: "/images/asad.jpg",
     email: "asad.javed@cust.edu.pk",
     phone: "0300-0000000",
     department: "Software Engineering",

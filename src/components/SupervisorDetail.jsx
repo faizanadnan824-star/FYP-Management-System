@@ -10,7 +10,12 @@ export default function SupervisorDetail({ supervisor, onBack, onEdit, onDelete 
       <article className="detail-profile-card">
         {/* Header */}
         <header className="profile-header">
-          <figure className="profile-avatar">{initials}</figure>
+          <figure className="profile-avatar">
+            {supervisor.image
+              ? <img src={supervisor.image} alt={supervisor.name} style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} />
+              : initials
+            }
+          </figure>
           <section>
             <h2 className="profile-name">{supervisor.name}</h2>
             <p className="profile-title">{supervisor.designation} · {supervisor.department}</p>

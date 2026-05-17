@@ -41,7 +41,12 @@ export default function SupervisorList({ supervisors, onView, onEdit, onDelete, 
           {filtered.map(sv => (
             <article key={sv.id} className="supervisor-card">
               <figure className="list-avatar">
-                {sv.name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()}
+                {sv.image 
+                  ? <img src={sv.image} alt={sv.name} style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" , borderColor: "black"
+
+                  }} />
+                  : sv.name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()
+                }
               </figure>
               <section className="card-content">
                 <header className="card-header-row">
