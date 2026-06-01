@@ -1,0 +1,49 @@
+const navItems = [
+  { id: "dashboard", icon: "ti-layout-dashboard", label: "Dashboard" },
+  { id: "supervisors", icon: "ti-users", label: "Supervisors" },
+  { id: "addSupervisor", icon: "ti-user-plus", label: "Add Supervisor" },
+];
+
+export default function Sidebar({ activeTab, setActiveTab }) {
+  return (
+    <aside className="sidebar">
+      {/* Logo */}
+      <header className="sidebar-header">
+        <section className="logo-container">
+          <figure className="logo-icon-wrapper">
+            <i className="ti ti-school logo-icon" />
+          </figure>
+          <section>
+            <p className="admin-panel-text">Admin Panel</p>
+            <p className="department-text">FUSST IET Department</p>
+          </section>
+        </section>
+      </header>
+
+      {/* Nav */}
+      <nav className="sidebar-nav">
+        {navItems.map((item) => (
+          <button
+            key={item.id}
+            onClick={() => setActiveTab(item.id)}
+            className={`nav-button ${activeTab === item.id ? "active" : ""}`}
+          >
+            <i className={`ti ${item.icon} nav-icon`} />
+            {item.label}
+          </button>
+        ))}
+      </nav>
+
+      {/* Admin info */}
+      <footer className="sidebar-footer">
+        <section className="admin-info-container">
+          <figure className="admin-avatar">AD</figure>
+          <section>
+            <p className="admin-name">Admin</p>
+            <p className="admin-email">admin@uni.edu</p>
+          </section>
+        </section>
+      </footer>
+    </aside>
+  );
+}
