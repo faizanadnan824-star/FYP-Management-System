@@ -1,0 +1,55 @@
+export const supervisorsData = [
+  {
+    id: 1,
+    name: "Mr. Asad Javed",
+    // image: "/images/asad.jpg",
+    email: "asad.javed@cust.edu.pk",
+    phone: "0300-0000000",
+    department: "Software Engineering",
+    specialization: "Mobile Application Development",
+    designation: "Lecturer",
+    education: [
+      { degree: "Master's in Computer Science", institute: "CUST, Islamabad", years: "2020–2022" },
+      { degree: "Bachelor's in Software Engineering", institute: "CUST, Islamabad", years: "2016–2020" },
+    ],
+    bio: "A Lecturer with experience in both academia and the software industry, specializing in mobile application development and software engineering. Focused on bridging industry practices with academic learning to prepare students for real-world challenges.",
+    roles: [
+      "Probation Committee Member",
+      "CQI Team Member",
+      "Academic Supervisor for SIT students",
+      "Technology Project Supervisor",
+    ],
+    maxProjects: 3,
+    status: "Active",
+  },
+   {
+    id: 2,
+    name: "Mr. Shamshair",
+    email: "shamshair@cust.edu.pk",
+    phone: "0300-11111111",
+    department: "Information Engineering Technology",
+    specialization: "Web Technology",
+    designation: "Lecturer",
+    education: [
+      {
+        degree: "Master's in Information Technology",
+        institute: "CUST, Islamabad",
+        years: "2020–2022",
+      },
+      {
+        degree: "Bachelor's in Information Engineering Technology",
+        institute: "CUST, Islamabad",
+        years: "2016–2020",
+      },
+    ],
+    bio: "A dedicated Lecturer specializing in web technologies and modern web application development. Passionate about teaching industry-oriented skills and guiding students in developing scalable and user-friendly web solutions.",
+    roles: [
+      "Academic Supervisor for IET students",
+      "Web Technology Project Supervisor",
+      "Curriculum Development Team Member",
+      "Technology Research Mentor",
+    ],
+    maxProjects: 3,
+    status: "Active",
+  },
+];
