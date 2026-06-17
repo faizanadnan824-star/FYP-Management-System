@@ -1,11 +1,13 @@
 import { useState } from "react";
 
-export default function SupervisorList({ supervisors, onView, onEdit, onDelete, onAdd }) {
+export default function SupervisorList({ supervisors, onView, onEdit, onDelete, onAdd, loading }) {
   const [search, setSearch] = useState("");
+
   const filtered = supervisors.filter(sv =>
-    sv.name.toLowerCase().includes(search.toLowerCase()) ||
-    sv.email.toLowerCase().includes(search.toLowerCase()) ||
-    sv.department.toLowerCase().includes(search.toLowerCase())
+    sv.name?.toLowerCase().includes(search.toLowerCase()) ||
+    sv.email?.toLowerCase().includes(search.toLowerCase()) ||
+    sv.department?.toLowerCase().includes(search.toLowerCase()) ||
+    sv.specialization?.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -23,54 +25,76 @@ export default function SupervisorList({ supervisors, onView, onEdit, onDelete, 
       {/* Search */}
       <section className="search-wrapper">
         <i className="ti ti-search search-icon" />
-        <input 
-          value={search} 
-          onChange={e => setSearch(e.target.value)} 
+        <input
+          value={search}
+          onChange={e => setSearch(e.target.value)}
           placeholder="Search by name, email or department..."
           className="search-input"
         />
       </section>
 
-      {filtered.length === 0 ? (
+      {/* Loading */}
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: '60px', color: '#64748b' }}>
+          <p>Loading supervisors...</p>
+        </div>
+
+      /* Empty */
+      ) : filtered.length === 0 ? (
         <section className="empty-state">
           <i className="ti ti-users-off" />
-          <p>No supervisors found</p>
+          <p>{search ? 'No supervisors match your search' : 'No supervisors added yet'}</p>
         </section>
+
+      /* Cards */
       ) : (
         <section>
-          {filtered.map(sv => (
-            <article key={sv.id} className="supervisor-card">
-              <figure className="list-avatar">
-                {sv.image 
-                  ? <img src={sv.image} alt={sv.name} style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" , borderColor: "black"
+          {filtered.map(sv => {
+            const id       = sv._id || sv.id;
+            const isActive = sv.isActive || sv.status === 'Active';
+            const dept     = sv.department || '—';
+            const spec     = sv.specialization || sv.field || '—';
+            const maxP     = sv.maxStudents || sv.maxProjects || '—';
 
-                  }} />
-                  : sv.name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()
-                }
-              </figure>
-              <section className="card-content">
-                <header className="card-header-row">
-                  <p className="sv-name">{sv.name}</p>
-                  <span className={`status-pill ${sv.status === "Active" ? "pill-active" : "pill-inactive"}`}>
-                    {sv.status}
-                  </span>
-                </header>
-                <p className="sv-contact">{sv.email} · {sv.department}</p>
-                <p className="sv-details">{sv.specialization} · Max {sv.maxProjects} projects</p>
-              </section>
-              <nav className="card-actions">
-                <button onClick={() => onView(sv)} className="btn-view">
-                  <i className="ti ti-eye" /> View
-                </button>
-                <button onClick={() => onEdit(sv)} className="btn-edit-small">
-                  <i className="ti ti-edit" /> Edit
-                </button>
-                <button onClick={() => onDelete(sv.id)} className="btn-delete-small">
-                  <i className="ti ti-trash" />
-                </button>
-              </nav>
-            </article>
-          ))}
+            return (
+              <article key={id} className="supervisor-card">
+
+                {/* Avatar */}
+                <figure className="list-avatar">
+                  {sv.image
+                    ? <img src={sv.image} alt={sv.name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                    : sv.name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
+                  }
+                </figure>
+
+                {/* Info */}
+                <section className="card-content">
+                  <header className="card-header-row">
+                    <p className="sv-name">{sv.name}</p>
+                    <span className={`status-pill ${isActive ? 'pill-active' : 'pill-inactive'}`}>
+                      {isActive ? 'Active' : 'Inactive'}
+                    </span>
+                  </header>
+                  <p className="sv-contact">{sv.email} · {dept}</p>
+                  <p className="sv-details">{spec} · Max {maxP} projects</p>
+                </section>
+
+                {/* Actions */}
+                <nav className="card-actions">
+                  <button onClick={() => onView(sv)} className="btn-view">
+                    <i className="ti ti-eye" /> View
+                  </button>
+                  <button onClick={() => onEdit(sv)} className="btn-edit-small">
+                    <i className="ti ti-edit" /> Edit
+                  </button>
+                  <button onClick={() => onDelete(id)} className="btn-delete-small">
+                    <i className="ti ti-trash" />
+                  </button>
+                </nav>
+
+              </article>
+            );
+          })}
         </section>
       )}
     </main>

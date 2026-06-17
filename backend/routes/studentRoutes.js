@@ -1,55 +1,39 @@
 const express = require('express');
-const router = express.Router();
-const Project = require('../models/Project');
-const User = require('../models/User');
-const { protect } = require('../middleware/authMiddleware');
+const router  = express.Router();
+const User    = require('../models/User');
+const { protect, adminOnly } = require('../middleware/authMiddleware');
 
-// 1. Submit Proposal
-router.post('/proposal', protect, async (req, res) => {
+// GET all students — admin only
+router.get('/', protect, adminOnly, async (req, res) => {
   try {
-    if (req.user.role !== 'student') {
-      return res.status(403).json({ message: 'Access denied. Student context required.' });
-    }
-
-    const { title, description, supervisorEmail } = req.body;
-    const supervisor = await User.findOne({ email: supervisorEmail, role: 'supervisor' });
-    if (!supervisor) return res.status(404).json({ message: 'Faculty supervisor matching this email not found.' });
-
-    // Check if student already submitted a proposal
-    const existingProposal = await Project.findOne({ studentId: req.user._id });
-    if (existingProposal) return res.status(400).json({ message: 'You have already submitted a proposal.' });
-
-    const newProject = new Project({
-      title,
-      description,
-      supervisorEmail,
-      studentId: req.user._id,
-      supervisorId: supervisor._id
-    });
-    
-    await newProject.save();
-    await User.findByIdAndUpdate(req.user._id, { projectId: newProject._id });
-
-    res.status(201).json({ message: 'Proposal submitted successfully.', proposal: newProject });
-  } catch (err) {
-    res.status(500).json({ message: 'Transaction tracking collection anomaly: ' + err.message });
-  }
+    const students = await User.find({ role: 'student' })
+      .select('-password')
+      .populate('supervisorId', 'name email')
+      .sort({ createdAt: -1 });
+    res.json(students);
+  } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// 2. Get Student Proposal
-router.get('/proposal', protect, async (req, res) => {
+// PUT assign supervisor to student — admin only
+router.put('/:id/assign', protect, adminOnly, async (req, res) => {
   try {
-    if (req.user.role !== 'student') {
-      return res.status(403).json({ message: 'Access denied.' });
-    }
-    const proposal = await Project.findOne({ studentId: req.user._id });
-    res.json(proposal);
-  } catch (err) {
-    res.status(500).json({ message: 'Database fetch fault.' });
-  }
+    const { supervisorId } = req.body;
+    const student = await User.findByIdAndUpdate(
+      req.params.id,
+      { supervisorId: supervisorId || null },
+      { new: true }
+    ).select('-password').populate('supervisorId', 'name email');
+    if (!student) return res.status(404).json({ message: 'Student not found' });
+    res.json({ message: 'Supervisor assigned', student });
+  } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-router.get('/progress', protect, (req, res) => res.json([]));
-router.get('/feedback', protect, (req, res) => res.json([]));
+// DELETE student — admin only
+router.delete('/:id', protect, adminOnly, async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Student removed' });
+  } catch (err) { res.status(500).json({ message: err.message }); }
+});
 
 module.exports = router;

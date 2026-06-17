@@ -1,14 +1,13 @@
 const navItems = [
-  { id: "dashboard",      icon: "ti-layout-dashboard", label: "Dashboard" },
-  { id: "supervisors",    icon: "ti-users",             label: "Supervisors" },
-  { id: "addSupervisor",  icon: "ti-user-plus",         label: "Add Supervisor" },
+  { id: "dashboard",     icon: "ti-layout-dashboard", label: "Dashboard"      },
+  { id: "supervisors",   icon: "ti-users",             label: "Supervisors"    },
+  { id: "addSupervisor", icon: "ti-user-plus",         label: "Add Supervisor" },
+  { id: "students",      icon: "ti-school",            label: "Students"       },
 ];
 
 export default function Sidebar({ activeTab, setActiveTab, user, onLogout }) {
   return (
     <aside className="sidebar">
-
-      {/* Logo */}
       <header className="sidebar-header">
         <section className="logo-container">
           <figure className="logo-icon-wrapper">
@@ -21,7 +20,6 @@ export default function Sidebar({ activeTab, setActiveTab, user, onLogout }) {
         </section>
       </header>
 
-      {/* Nav */}
       <nav className="sidebar-nav">
         {navItems.map((item) => (
           <button
@@ -35,7 +33,6 @@ export default function Sidebar({ activeTab, setActiveTab, user, onLogout }) {
         ))}
       </nav>
 
-      {/* Admin info + logout */}
       <footer className="sidebar-footer">
         <section className="admin-info-container">
           <figure className="admin-avatar">
@@ -46,32 +43,17 @@ export default function Sidebar({ activeTab, setActiveTab, user, onLogout }) {
             <p className="admin-email">{user?.email || 'admin@fui.edu.pk'}</p>
           </section>
         </section>
-
         {onLogout && (
           <button
             onClick={onLogout}
-            style={{
-              width: '100%',
-              marginTop: '10px',
-              padding: '9px',
-              background: 'rgba(255,255,255,0.1)',
-              color: 'white',
-              border: '1px solid rgba(255,255,255,0.2)',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontSize: '13px',
-              fontWeight: '600',
-              fontFamily: 'inherit',
-              transition: '0.2s ease',
-            }}
-            onMouseOver={e => e.target.style.background = 'rgba(255,255,255,0.2)'}
-            onMouseOut={e => e.target.style.background = 'rgba(255,255,255,0.1)'}
+            style={{ width:'100%', marginTop:'10px', padding:'9px', background:'rgba(255,255,255,0.1)', color:'white', border:'1px solid rgba(255,255,255,0.2)', borderRadius:'8px', cursor:'pointer', fontSize:'13px', fontWeight:'600', fontFamily:'inherit', transition:'0.2s ease' }}
+            onMouseOver={e => e.currentTarget.style.background='rgba(255,255,255,0.2)'}
+            onMouseOut={e => e.currentTarget.style.background='rgba(255,255,255,0.1)'}
           >
             Sign Out
           </button>
         )}
       </footer>
-
     </aside>
   );
 }

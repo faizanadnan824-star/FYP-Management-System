@@ -1,55 +1,64 @@
 const express = require('express');
-const router = express.Router();
-const User = require('../models/User'); 
-const bcrypt = require('bcryptjs');
+const router  = express.Router();
+const User    = require('../models/User');
+const bcrypt  = require('bcryptjs');
+const { protect, adminOnly } = require('../middleware/authMiddleware');
 
-router.post('/add', async (req, res) => {
+// GET all supervisors
+router.get('/', protect, adminOnly, async (req, res) => {
   try {
-    const { name, email, password, phone, designation, bio } = req.body;
-    
-    // Check agar user pehle se exist karta hai
-    const existing = await User.findOne({ email });
-    if (existing) return res.status(400).json({ error: "Email already registered!" });
-
-    // Password hashing
-    const hashedPassword = await bcrypt.hash(password, 12);
-    
-    const newSupervisor = new User({
-      name, email, 
-      password: hashedPassword, 
-      phone, 
-      designation, 
-      field: bio, // Schema ke mutabiq bio ko field mein save kiya
-      role: 'supervisor'
-    });
-    
-    await newSupervisor.save();
-    res.status(201).json({ message: "Supervisor saved permanently!" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+    const list = await User.find({ role: 'supervisor' }).select('-password').sort({ createdAt: -1 });
+    res.json(list);
+  } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-router.get('/all', async (req, res) => {
+// POST create supervisor
+router.post('/', protect, adminOnly, async (req, res) => {
   try {
-    // Database se saare supervisor nikal rahe hain
-    const supervisors = await User.find({ role: 'supervisor' });
-    
-    // Frontend ke hisaab se data map karke bhejein
-    const formatted = supervisors.map(sv => ({
-      id: sv._id, // sv.id ki jagah sv._id
-      name: sv.name,
-      email: sv.email,
-      department: sv.department || "N/A",
-      status: sv.isActive ? "Active" : "Inactive", // sv.status ki jagah
-      specialization: sv.field || "N/A", // sv.specialization ki jagah
-      maxProjects: sv.maxStudents || 0 // sv.maxProjects ki jagah
-    }));
-    
-    res.json(formatted);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+    const { name, email, password, phone, designation, department, specialization, maxStudents, bio, status, image } = req.body;
+    if (!name || !email || !password) return res.status(400).json({ message: 'Name, email and password required' });
+    if (await User.findOne({ email })) return res.status(400).json({ message: 'Email already exists' });
+    const hashed = await bcrypt.hash(password, 12);
+    const sv = await User.create({
+      name, email, password: hashed, role: 'supervisor',
+      phone, designation, department, specialization,
+      maxStudents: maxStudents || 5, bio, image,
+      isActive: status === 'Active',
+    });
+    const { password: _, ...data } = sv.toObject();
+    res.status(201).json({ message: 'Supervisor created', supervisor: data });
+  } catch (err) { res.status(500).json({ message: err.message }); }
+});
+
+// GET single supervisor
+router.get('/:id', protect, adminOnly, async (req, res) => {
+  try {
+    const sv = await User.findById(req.params.id).select('-password');
+    if (!sv) return res.status(404).json({ message: 'Not found' });
+    res.json(sv);
+  } catch (err) { res.status(500).json({ message: err.message }); }
+});
+
+// PUT update supervisor
+router.put('/:id', protect, adminOnly, async (req, res) => {
+  try {
+    const { name, email, phone, designation, department, specialization, maxStudents, bio, status, image } = req.body;
+    const sv = await User.findByIdAndUpdate(
+      req.params.id,
+      { name, email, phone, designation, department, specialization, maxStudents, bio, image, isActive: status === 'Active' },
+      { new: true }
+    ).select('-password');
+    if (!sv) return res.status(404).json({ message: 'Not found' });
+    res.json({ message: 'Updated', supervisor: sv });
+  } catch (err) { res.status(500).json({ message: err.message }); }
+});
+
+// DELETE supervisor
+router.delete('/:id', protect, adminOnly, async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Supervisor removed' });
+  } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
 module.exports = router;
